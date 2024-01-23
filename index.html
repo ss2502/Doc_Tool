@@ -1,0 +1,449 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Order Processor Doc Tool</title>
+    <link rel="stylesheet" type="text/css" href="style.css">
+    <style>
+       /* Add a bit of spacing between the sections */
+       .section {
+            margin-bottom: 20px;
+        }
+
+        /* Style to add some space between options */
+        label {
+            display: block;
+            margin-bottom: 5px;
+        }
+
+        .print-type-options,
+        .screenprint-breakpoint-options,
+        .sense-of-urgency-options,
+        .garment-related-options,
+        .email-to-printer-options,
+        .attention-to-detail-options {
+            display: none;
+        }
+
+        /* Add flex display for checkboxes and radio buttons */
+        #attentionToDetailOptions label,
+        #emailToPrinterOptions label {
+            display: flex;
+            align-items: center;
+        }
+
+        #attentionToDetailOptions input[type="checkbox"],
+        #emailToPrinterOptions input[type="checkbox"] {
+            margin-right: 5px;
+        }
+
+        /* Add a bit of margin for better spacing */
+        #attentionToDetailOptions label,
+        #emailToPrinterOptions label,
+        #attentionToDetailOptions input[type="checkbox"],
+        #emailToPrinterOptions input[type="checkbox"],
+        #attentionToDetailOptions input[type="radio"],
+        #emailToPrinterOptions input[type="radio"] {
+            margin-right: 10px;
+        }
+    </style>
+    
+    <script>
+        var meetingBreakpointCheckbox; // Declare the variable globally
+
+        function showPrintTypeOptions() {
+            var printTypeOptions = document.getElementById("printTypeOptions");
+            toggleDisplay(printTypeOptions);
+        }
+
+        function showScreenprintBreakpointOptions() {
+            var screenprintBreakpointOptions = document.getElementById("screenprintBreakpointOptions");
+            toggleDisplay(screenprintBreakpointOptions);
+        }
+
+        function showSenseOfUrgencyOptions() {
+            var senseOfUrgencyOptions = document.getElementById("senseOfUrgencyOptions");
+            toggleDisplay(senseOfUrgencyOptions);
+        }
+
+        function showGarmentRelatedOptions() {
+            var garmentRelatedOptions = document.getElementById("garmentRelatedOptions");
+            toggleDisplay(garmentRelatedOptions);
+        }
+
+        function showEmailToPrinterOptions() {
+            var emailToPrinterOptions = document.getElementById("emailToPrinterOptions");
+            var attentionToDetailOptions = document.getElementById("attentionToDetailOptions");
+
+            toggleDisplay(emailToPrinterOptions);
+            toggleDisplay(attentionToDetailOptions, false);
+        }
+
+        function toggleMeetingBreakpointTextbox() {
+            var meetingBreakpointAmount = document.getElementById("meetingBreakpointAmount");
+            meetingBreakpointAmount.style.display = meetingBreakpointCheckbox.checked ? "block" : "none";
+            captureInfo();
+        }
+
+        function toggleMetSLAOptions() {
+            var metSLAOptions = document.getElementById("metSLAOptions");
+            metSLAOptions.style.display = metSLACheckbox.checked ? "block" : "none";
+            captureInfo();
+        }
+
+        function toggleOrderNoTextBox() {
+            var orderNoTextBox = document.getElementById("orderNoTextBox");
+            orderNoTextBox.style.display = orderNoCheckbox.checked ? "block" : "none";
+            captureInfo();
+        }
+
+        function toggleItemCountTextbox() {
+            var itemCountTextbox = document.getElementById("itemCountTextbox");
+            itemCountTextbox.style.display = itemCountCheckbox.checked ? "block" : "none";
+            captureInfo();
+        }
+
+        function toggleAttentionToDetailOptions() {
+            var attentionToDetailOptions = document.getElementById("attentionToDetailOptions");
+            toggleDisplay(attentionToDetailOptions);
+        }
+
+        function toggleDisplay(element, capture = true) {
+            if (element.style.display === "none") {
+                element.style.display = "block";
+            } else {
+                element.style.display = "none";
+            }
+            if (capture) {
+                captureInfo();
+            }
+        }
+
+        function captureInfo() {
+            var resultTextBox = document.getElementById("result"); // Move this line to the beginning
+
+            var orderNoCheckbox = document.getElementById("orderNoCheckbox");
+            var orderNoTextBox = document.getElementById("orderNoTextBox");
+            var printTypeCheckboxes = document.querySelectorAll('.print-type-checkbox');
+            meetingBreakpointCheckbox = document.getElementById("meetingBreakpointCheckbox");
+            var meetingBreakpointAmount = document.getElementById("meetingBreakpointAmount");
+            var naCheckbox = document.getElementById("naCheckbox");
+            var senseOfUrgencyCheckbox = document.getElementById("senseOfUrgencyCheckbox");
+            var metSLACheckbox = document.getElementById("metSLACheckbox");
+            var metSLAOptions = document.getElementById("metSLAOptions");
+            var metSLAOptionYes = document.getElementById("metSLAOptionYes");
+            var metSLAOptionNo = document.getElementById("metSLAOptionNo");
+            var respondedOpenCommCheckbox = document.getElementById("respondedOpenCommCheckbox");
+            var itemCountCheckbox = document.getElementById("itemCountCheckbox");
+            var itemCountTextbox = document.getElementById("itemCountTextbox");
+            var ribbedGarmentCheckbox = document.getElementById("ribbedGarmentCheckbox");
+            var breakdownMatchingCheckbox = document.getElementById("breakdownMatchingCheckbox");
+
+            var orderNo = orderNoCheckbox.checked ? orderNoTextBox.value : "";
+            var selectedPrintTypes = [];
+            // Attention to Detail options
+            var attentionToDetailResult = captureAttentionToDetail();
+
+            printTypeCheckboxes.forEach(function (checkbox) {
+                if (checkbox.checked) {
+                    selectedPrintTypes.push(checkbox.value);
+                }
+            });
+
+            var screenprintBreakpoint = "";
+            if (meetingBreakpointCheckbox.checked) {
+                screenprintBreakpoint += "Meeting breakpoint: " + meetingBreakpointAmount.value + ", ";
+            }
+            if (naCheckbox.checked) {
+                screenprintBreakpoint += "NA, ";
+            }
+            screenprintBreakpoint = screenprintBreakpoint.replace(/,\s*$/, "");
+
+            var senseOfUrgency = "";
+            if (metSLACheckbox.checked) {
+                senseOfUrgency += "Met SLA: " + (metSLAOptionYes.checked ? "Yes" : "No") + ", ";
+            }
+            if (respondedOpenCommCheckbox.checked) {
+                senseOfUrgency += "Responded to all open communication, ";
+            }
+            senseOfUrgency = senseOfUrgency.replace(/,\s*$/, "");
+
+            var garmentRelatedChecklist = "";
+            if (ribbedGarmentCheckbox.checked) {
+                garmentRelatedChecklist += "Ribbed garment - Informed about stretch additives, ";
+            }
+            if (breakdownMatchingCheckbox.checked) {
+                garmentRelatedChecklist += "Breakdown matching in Invoice and Order dash, ";
+            }
+            garmentRelatedChecklist = garmentRelatedChecklist.replace(/,\s*$/, "");
+
+            var itemCount = itemCountCheckbox.checked ? "Number of items: " + itemCountTextbox.value : "";
+
+            var result = "Order No.: " + orderNo + "\nPrint type: " + selectedPrintTypes.join(", ") + "\nScreenprint breakpoint: " + screenprintBreakpoint +
+                "\nSense of urgency: " + senseOfUrgency + "\nGarment Related Checklist: " + garmentRelatedChecklist + "\n" + itemCount +
+                "\n\n" + attentionToDetailResult;
+
+            resultTextBox.value = result;
+        }
+
+        function captureAttentionToDetail() {
+            var blanksOrderedCheckbox = document.getElementById("blanksOrderedCheckbox");
+            var blanksOrderedValue = getSelectedRadioValue("blanksOrdered");
+
+            var poBoxAddressCheckbox = document.getElementById("poBoxAddressCheckbox");
+            var poBoxAddressValue = getSelectedRadioValue("poBoxAddress");
+
+            var metFreeShippingCheckbox = document.getElementById("metFreeShippingCheckbox");
+            var metFreeShippingValue = getSelectedRadioValue("metFreeShipping");
+
+            var updatedInfoAboutHDDCheckbox = document.getElementById("updatedInfoAboutHDDCheckbox");
+            var updatedInfoAboutHDDValue = getSelectedRadioValue("updatedInfoAboutHDD");
+
+            var ladiesFitCheckCheckbox = document.getElementById("ladiesFitCheckCheckbox");
+            var ladiesFitCheckValue = getSelectedRadioValue("ladiesFitCheck");
+
+            var pngFileSharedCheckbox = document.getElementById("pngFileSharedCheckbox");
+            var pngFileSharedValue = getSelectedRadioValue("pngFileShared");
+
+            var informedAboutEarlyDeliveryCheckbox = document.getElementById("informedAboutEarlyDeliveryCheckbox");
+            var informedAboutEarlyDeliveryValue = getSelectedRadioValue("informedAboutEarlyDelivery");
+
+            var verifiedNameOnDesignCheckbox = document.getElementById("verifiedNameOnDesignCheckbox");
+            var verifiedNameOnDesignValue = getSelectedRadioValue("verifiedNameOnDesign");
+
+            var attentionToDetailResult = "Blanks Ordered from Alpha: " + (blanksOrderedCheckbox.checked ? blanksOrderedValue : "NA") + "\n" +
+                "PO Box address on Dash: " + (poBoxAddressCheckbox.checked ? poBoxAddressValue : "NA") + "\n" +
+                "Met free shipping cutoff: " + (metFreeShippingCheckbox.checked ? metFreeShippingValue : "NA") + "\n" +
+                "Informed/Updated info about HDD: " + (updatedInfoAboutHDDCheckbox.checked ? updatedInfoAboutHDDValue : "NA") + "\n" +
+                "Ladies fit check: " + (ladiesFitCheckCheckbox.checked ? ladiesFitCheckValue : "NA") + "\n" +
+                "PNG file shared for DTG/DTF order: " + (pngFileSharedCheckbox.checked ? pngFileSharedValue : "NA") + "\n" +
+                "Informed about early Delivery: " + (informedAboutEarlyDeliveryCheckbox.checked ? informedAboutEarlyDeliveryValue : "NA") + "\n" +
+                "Verified name on design: " + (verifiedNameOnDesignCheckbox.checked ? verifiedNameOnDesignValue : "NA");
+
+            return attentionToDetailResult;
+        }
+
+        function getSelectedRadioValue(name) {
+            var radioButtons = document.getElementsByName(name);
+            for (var i = 0; i < radioButtons.length; i++) {
+                if (radioButtons[i].checked) {
+                    return radioButtons[i].value;
+                }
+            }
+            return "NA"; // Return "NA" if no radio button is selected
+        }
+
+        function generateTimestamp() {
+            var timestamp = new Date().toLocaleString();
+            document.getElementById("result").value += "\nTimestamp: " + timestamp;
+        }
+
+        function generateDocumentation() {
+            captureInfo(); // Update the information before generating documentation
+
+            var resultTextBox = document.getElementById("result");
+            var documentation = resultTextBox.value;
+
+            // Add any additional logic for generating documentation here
+            // For now, let's just alert the documentation
+            alert(documentation);
+        }
+
+        var radioButtonClicked = false;
+
+        function onRadioButtonClick() {
+            radioButtonClicked = true;
+        }
+    </script>
+</head>
+
+<body>
+    <h1>Order Processor Doc Tool</h1>
+
+    <form>
+        <div class="section">
+            <p>
+                <label>
+                    <input type="checkbox" id="orderNoCheckbox" onclick="toggleOrderNoTextBox()"> Order No.
+                </label>
+                <input type="text" id="orderNoTextBox" placeholder="Enter order number" style="display: none;">
+            </p>
+        </div>
+
+        <!-- Print Type -->
+        <div class="section">
+            <p>
+                <input type="radio" name="printType" onclick="showPrintTypeOptions(); onRadioButtonClick()"> Select
+                Print Type<br>
+                <div id="printTypeOptions" class="print-type-options">
+                <label>
+                    <input type="checkbox" class="print-type-checkbox" value="Screen Printing"> Screen Printing
+                </label><br>
+                <label>
+                    <input type="checkbox" class="print-type-checkbox" value="DTG"> DTG
+                </label><br>
+                <label>
+                    <input type="checkbox" class="print-type-checkbox" value="Embroidery"> Embroidery
+                </label><br>
+                <label>
+                    <input type="checkbox" class="print-type-checkbox" value="Specialty"> Specialty
+                </label><br>
+                <label>
+                    <input type="checkbox" class="print-type-checkbox" value="Custom Name/Number"> Custom Name/Number
+                </label><br>
+            </div>
+        </p>
+
+        <!-- Screenprint Breakpoint -->
+        <p>
+            <input type="radio" name="screenprintBreakpoint" onclick="showScreenprintBreakpointOptions(); onRadioButtonClick()"> Screenprint Breakpoint<br>
+            <div id="screenprintBreakpointOptions" class="screenprint-breakpoint-options">
+                <label>
+                    <input type="checkbox" id="meetingBreakpointCheckbox" onclick="toggleMeetingBreakpointTextbox(); onRadioButtonClick()"> Meeting breakpoint
+                    <input type="text" id="meetingBreakpointAmount" placeholder="Enter amount" style="display: none;">
+                </label><br>
+                <label>
+                    <input type="checkbox" id="naCheckbox"> NA
+                </label><br>
+            </div>
+        </p>
+
+        <!-- Sense of Urgency -->
+        <p>
+            <input type="radio" name="senseOfUrgency" onclick="showSenseOfUrgencyOptions(); onRadioButtonClick()"> Sense of Urgency<br>
+            <div id="senseOfUrgencyOptions" class="sense-of-urgency-options">
+                <label>
+                    <input type="checkbox" id="metSLACheckbox" onclick="toggleMetSLAOptions(); onRadioButtonClick()"> Met SLA
+                    <div id="metSLAOptions" style="display: none;">
+                        <label><input type="radio" id="metSLAOptionYes" name="metSLAOption" value="Yes"> Yes</label>
+                        <label><input type="radio" id="metSLAOptionNo" name="metSLAOption" value="No"> No</label>
+                    </div>
+                </label><br>
+                <label>
+                    <input type="checkbox" id="respondedOpenCommCheckbox"> Responded to all open communication
+                </label><br>
+            </div>
+        </p>
+
+        <!-- Garment Related Checklist -->
+        <div class="section">
+            <p>
+                <input type="radio" name="garmentChecklist" onclick="showGarmentRelatedOptions(); onRadioButtonClick()"> Garment
+                Related Checklist<br>
+                <div id="garmentRelatedOptions" class="garment-related-options">
+                <label>
+                    <input type="checkbox" id="ribbedGarmentCheckbox"> Ribbed garment - Informed about stretch additives
+                </label><br>
+                <label>
+                    <input type="checkbox" id="breakdownMatchingCheckbox"> Breakdown matching in Invoice and Order dash
+                </label><br>
+                <label>
+                    <input type="checkbox" id="itemCountCheckbox" onclick="toggleItemCountTextbox(); onRadioButtonClick()"> # of Items in the order
+                    <input type="text" id="itemCountTextbox" placeholder="Enter count" style="display: none;">
+                </label><br>
+            </div>
+        </p>
+
+        <!-- Email to Printer -->
+        <p>
+            <input type="radio" name="emailToPrinter" onclick="showEmailToPrinterOptions(); onRadioButtonClick()"> Email to Printer<br>
+            <div id="emailToPrinterOptions" class="email-to-printer-options">
+                <label>
+                    <input type="checkbox" id="informedSameDesignCheckbox"> Informed about same design
+                    <label><input type="radio" id="informedSameDesignYes" name="informedSameDesign" value="Yes"> Yes</label>
+                    <label><input type="radio" id="informedSameDesignNA" name="informedSameDesign" value="NA"> NA</label>
+                </label><br>
+                <label>
+                    <input type="checkbox" id="connectedOrdersCheckbox"> Connected orders/Re-order/Reprint info provided
+                    <label><input type="radio" id="connectedOrdersYes" name="connectedOrders" value="Yes"> Yes</label>
+                    <label><input type="radio" id="connectedOrdersNA" name="connectedOrders" value="NA"> NA</label>
+                </label><br>
+                <label>
+                    <input type="checkbox" id="customNameNumberCheckbox"> Custom name/number file updated as PDF
+                    <label><input type="radio" id="customNameNumberYes" name="customNameNumber" value="Yes"> Yes</label>
+                    <label><input type="radio" id="customNameNumberNA" name="customNameNumber" value="NA"> NA</label>
+                </label><br>
+            </div>
+        </p>
+       <!-- Attention to Detail -->
+       <div class="section">
+        <p>
+            <input type="radio" name="attentionToDetail" onclick="toggleAttentionToDetailOptions(); onRadioButtonClick()"> Attention
+            to Detail<br>
+            <div id="attentionToDetailOptions" class="attention-to-detail-options" style="display: block;">
+        <label id="blanksOrderedLabel">
+            <input type="checkbox" id="blanksOrderedCheckbox"> Blanks Ordered from Alpha
+            <label><input type="radio" name="blanksOrdered" value="Yes"> Yes</label>
+            <label><input type="radio" name="blanksOrdered" value="No"> No</label>
+            <label><input type="radio" name="blanksOrdered" value="NA"> NA</label>
+        </label><br>
+
+        <label id="poBoxAddressLabel">
+            <input type="checkbox" id="poBoxAddressCheckbox"> PO Box address on Dash
+            <label><input type="radio" name="poBoxAddress" value="No"> No</label>
+            <label><input type="radio" name="poBoxAddress" value="NA"> NA</label>
+        </label><br>
+
+        <label id="metFreeShippingLabel">
+            <input type="checkbox" id="metFreeShippingCheckbox"> Met free shipping cutoff
+            <label><input type="radio" name="metFreeShipping" value="Yes"> Yes</label>
+            <label><input type="radio" name="metFreeShipping" value="NA"> NA</label>
+        </label><br>
+
+        <label id="updatedInfoAboutHDDLabel">
+            <input type="checkbox" id="updatedInfoAboutHDDCheckbox"> Informed/Updated info about HDD
+            <label><input type="radio" name="updatedInfoAboutHDD" value="Yes"> Yes</label>
+            <label><input type="radio" name="updatedInfoAboutHDD" value="NA"> NA</label>
+        </label><br>
+
+        <label id="ladiesFitCheckLabel">
+            <input type="checkbox" id="ladiesFitCheckCheckbox"> Ladies fit check
+            <label><input type="radio" name="ladiesFitCheck" value="Yes"> Yes</label>
+            <label><input type="radio" name="ladiesFitCheck" value="NA"> NA</label>
+        </label><br>
+
+        <label id="pngFileSharedLabel">
+            <input type="checkbox" id="pngFileSharedCheckbox"> PNG file shared for DTG/DTF order
+            <label><input type="radio" name="pngFileShared" value="Yes"> Yes</label>
+            <label><input type="radio" name="pngFileShared" value="NA"> NA</label>
+        </label><br>
+
+        <label id="informedAboutEarlyDeliveryLabel">
+            <input type="checkbox" id="informedAboutEarlyDeliveryCheckbox"> Informed about early Delivery
+            <label><input type="radio" name="informedAboutEarlyDelivery" value="Yes"> Yes</label>
+            <label><input type="radio" name="informedAboutEarlyDelivery" value="NA"> NA</label>
+        </label><br>
+
+        <label id="verifiedNameOnDesignLabel">
+            <input type="checkbox" id="verifiedNameOnDesignCheckbox"> Verified name on design
+            <label><input type="radio" name="verifiedNameOnDesign" value="Yes"> Yes</label>
+            <label><input type="radio" name="verifiedNameOnDesign" value="NA"> NA</label>
+        </label><br>
+    </div>
+</p>
+
+        <p>
+            <label>Result:</label><br>
+            <textarea id="result" rows="5" cols="50"></textarea>
+        </p>
+
+        <button type="button" onclick="generateTimestamp()">Generate Timestamp</button>
+        <button type="button" onclick="generateDocumentation()">Generate Documentation</button>
+    </form>
+
+    <script>
+        function toggleMetSLAOptions() {
+            var metSLAOptions = document.getElementById("metSLAOptions");
+            metSLAOptions.style.display = metSLACheckbox.checked ? "block" : "none";
+            captureInfo();
+        }
+
+        function toggleItemCountTextbox() {
+            var itemCountTextbox = document.getElementById("itemCountTextbox");
+            itemCountTextbox.style.display = itemCountCheckbox.checked ? "block" : "none";
+            captureInfo();
+        }
+    </script>
+</body>
+
+</html>
